@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 import 'package:geopoint/geopoint.dart';
@@ -58,10 +59,9 @@ class GeoPointSql {
       String url,
       @required int geoPointId,
       bool verbose}) async {
-    assert(path != null || url != null);
     if (database == null) throw ArgumentError("Database must not be null");
     if (geoPointId == null) throw ArgumentError("geoPointId must not be null");
-    if (path != null || url != null)
+    if (path == null && url == null)
       throw ArgumentError("You must provide either a path or an url");
     verbose = verbose ?? false;
     Map<String, String> row = {
@@ -81,8 +81,8 @@ class GeoPointSql {
     if (database == null) throw ArgumentError("Database must not be null");
     if (geoPointId == null) throw ArgumentError("geoPointId must not be null");
     List<Map<String, dynamic>> imgs = await database.select(
-        table: "geopoint_images", where: "geopoint_id=$geoPointId");
-    List<File> files;
+        table: "geopoint_image", where: "geopoint_id=$geoPointId");
+    var files = <File>[];
     imgs.forEach((img) {
       files.add(File(img["path"]));
     });
