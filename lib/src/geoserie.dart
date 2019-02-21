@@ -8,7 +8,7 @@ dbSaveGeoSerie(
   /// [database] is the database to use
   /// [verbose] print query info
   if (verbose) {
-    print("SAVING the ${geoSerie.name} ${geoSerie.serieType} serie");
+    print("SAVING the ${geoSerie.name} ${geoSerie.typeStr} serie");
   }
   Map<String, String> row = geoSerie.toMap(withId: false);
   try {
@@ -28,7 +28,7 @@ dbUpdateGeoSerie(
   /// [database] is the database to use
   /// [verbose] print query info
   if (verbose) {
-    print("Updating the ${geoSerie.name} ${geoSerie.serieType} serie");
+    print("Updating the ${geoSerie.name} ${geoSerie.typeStr} serie");
   }
   await database
       .update(
@@ -47,7 +47,7 @@ dbDeleteGeoSerie(
   /// [database] is the database to use
   /// [verbose] print query info
   if (verbose) {
-    print("Deleting the ${geoSerie.name} ${geoSerie.serieType} serie");
+    print("Deleting the ${geoSerie.name} ${geoSerie.typeStr} serie");
   }
   await database
       .delete(table: "geoserie", where: "id=${geoSerie.id}", verbose: verbose)
