@@ -139,7 +139,7 @@ Future<int> _saveGeoPoint(
         "SAVING GEOPOINT ${geoPoint.latitude}/${geoPoint.longitude} INTO DB $database");
   }
   int id;
-  Map<String, String> row = geoPoint.toMap();
+  Map<String, String> row = geoPoint.toStringsMap(withId: false);
   try {
     if (serieId != null) {
       row["geoserie"] = "$serieId";
