@@ -88,13 +88,6 @@ class GeoPointSql {
     });
     return files;
   }
-
-  Db database;
-  GeoPoint geoPoint;
-  String name;
-  bool withAddress;
-  int serieId;
-  bool verbose;
 }
 
 Future<GeoPoint> _dbSaveGeoPoint(
