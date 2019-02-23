@@ -38,7 +38,7 @@ class GeoPointSql {
       bool verbose}) async {
     if (database == null) throw ArgumentError("Database must not be null");
     verbose = verbose ?? false;
-    GeoPoint _gp = await getGeoPoint(name: name).catchError((e) {
+    GeoPoint _gp = await GeoPoint.getPosition(name: name).catchError((e) {
       throw (e);
     });
     GeoPoint gp = await _dbSaveGeoPoint(
