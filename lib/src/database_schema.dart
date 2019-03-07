@@ -1,15 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 
-initGeoDb(
-    {@required String dbpath, @required Db database, verbose = false}) async {
-  /// initialize a geo database
-  /// [dbpath] is the path to the database file
-  /// relative to the documents directory
-  /// [database] is the database to use, defaults to the
-  /// default Sqlcool database
-  /// [verbose] print the query
-  String q2 = """CREATE TABLE geopoint (
+/// The geo database sql schema
+var geoDbSchema = <String>[
+  """CREATE TABLE geopoint (
     id INTEGER PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     slug VARCHAR(60),
@@ -33,8 +27,8 @@ initGeoDb(
     CONSTRAINT geoserie_name
          FOREIGN KEY (geoserie_id)
          REFERENCES geoserie(id)
-         ON DELETE CASCADE)""";
-  String q3 = """CREATE TABLE geopoint_image(
+         ON DELETE CASCADE)""",
+  """CREATE TABLE geopoint_image(
     id INTEGER PRIMARY KEY,
     path VARCHAR(255),
     url VARCHAR(255),
@@ -43,13 +37,23 @@ initGeoDb(
         FOREIGN KEY (geopoint_id)
         REFERENCES geopoint(id)
         ON DELETE CASCADE,
-    CHECK(path IS NOT NULL OR (url IS NOT NULL)))""";
-  String q = """CREATE TABLE geoserie (
+    CHECK(path IS NOT NULL OR (url IS NOT NULL)))""",
+  """CREATE TABLE geoserie (
     id INTEGER PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
-    type CHECK(type = "group" or type = "line" or type="polygon"))""";
+    type CHECK(type = "group" or type = "line" or type="polygon"))"""
+];
+
+initGeoDb(
+    {@required String dbpath, @required Db database, verbose = false}) async {
+  /// initialize a geo database
+  /// [dbpath] is the path to the database file
+  /// relative to the documents directory
+  /// [database] is the database to use, defaults to the
+  /// default Sqlcool database
+  /// [verbose] print the query
   await database
-      .init(path: dbpath, queries: <String>[q, q2, q3], verbose: verbose)
+      .init(path: dbpath, queries: geoDbSchema, verbose: verbose)
       .catchError((e) {
     throw (e);
   });
