@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 
 /// The geo database sql schema
-var geoDbSchema = <String>[
+var geoDbSchema = const <String>[
   """CREATE TABLE geopoint (
     id INTEGER PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
