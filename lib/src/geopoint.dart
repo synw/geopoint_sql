@@ -7,22 +7,22 @@ import 'package:geopoint/geopoint.dart';
 
 /// Save a geopoint in the database
 Future<GeoPoint> saveGeoPoint(
-    {@required geoPoint,
-    @required database,
-    withAddress,
-    serieId,
-    verbose}) async {
+    {@required GeoPoint geoPoint,
+    @required Db database,
+    bool withAddress,
+    int serieId,
+    bool verbose}) async {
   if (database == null) throw ArgumentError("Database must not be null");
   if (geoPoint == null) throw ArgumentError("geoPoint must not be null");
   withAddress = withAddress ?? false;
   verbose = verbose ?? false;
-  GeoPoint gp = await _dbSaveGeoPoint(
+  final gp = await _dbSaveGeoPoint(
           database: database,
           geoPoint: geoPoint,
           withAddress: withAddress,
           serieId: serieId,
           verbose: verbose)
-      .catchError((e) {
+      .catchError((dynamic e) {
     throw (e);
   });
   return gp;
@@ -37,17 +37,18 @@ Future<void> saveGeoPointImage(
     bool verbose}) async {
   if (database == null) throw ArgumentError("Database must not be null");
   if (geoPointId == null) throw ArgumentError("geoPointId must not be null");
-  if (path == null && url == null)
+  if (path == null && url == null) {
     throw ArgumentError("You must provide either a path or an url");
+  }
   verbose = verbose ?? false;
-  Map<String, String> row = {
+  final row = <String, String>{
     "path": path,
     "url": url,
     "geopoint_id": "$geoPointId",
   };
   await database
       .insert(table: "geopoint_image", row: row, verbose: verbose)
-      .catchError((e) {
+      .catchError((dynamic e) {
     throw (e);
   });
 }
@@ -57,11 +58,11 @@ Future<List<File>> getGeoPointImages(
     {@required Db database, @required int geoPointId}) async {
   if (database == null) throw ArgumentError("Database must not be null");
   if (geoPointId == null) throw ArgumentError("geoPointId must not be null");
-  List<Map<String, dynamic>> imgs = await database.select(
+  final imgs = await database.select(
       table: "geopoint_image", where: "geopoint_id=$geoPointId");
-  var files = <File>[];
+  final files = <File>[];
   imgs.forEach((img) {
-    String path = img["path"];
+    final path = img["path"].toString();
     files.add(File(path));
   });
   return files;
@@ -72,7 +73,7 @@ Future<GeoPoint> _dbSaveGeoPoint(
     @required GeoPoint geoPoint,
     bool withAddress,
     int serieId,
-    verbose}) async {
+    bool verbose}) async {
   if (database == null) throw ArgumentError("Database must not be null");
   if (geoPoint == null) throw ArgumentError("geoPoint must not be null");
   withAddress = withAddress ?? false;
@@ -83,7 +84,7 @@ Future<GeoPoint> _dbSaveGeoPoint(
           geoPoint: geoPoint,
           verbose: verbose,
           serieId: serieId)
-      .catchError((e) {
+      .catchError((dynamic e) {
     throw (e);
   });
   geoPoint.id = id;
@@ -103,18 +104,18 @@ Future<int> _saveGeoPoint(
         "SAVING GEOPOINT ${geoPoint.latitude}/${geoPoint.longitude} INTO DB $database");
   }
   int id;
-  Map<String, String> row = geoPoint.toMap(withId: false);
+  final row = geoPoint.toMap(withId: false);
   try {
     if (serieId != null) {
       row["geoserie"] = "$serieId";
     }
     id = await database
         .insert(table: "geopoint", row: row, verbose: verbose)
-        .catchError((e) {
+        .catchError((dynamic e) {
       throw (e);
     });
   } catch (e) {
-    throw (e);
+    rethrow;
   }
   return id;
 }

@@ -22,7 +22,7 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
   final ItemWidgetBuilder markersTrailingBuilder;
 
   SelectBloc bloc;
-  int _selectedPos = 3;
+  final _selectedPos = 3;
   double bottomNavBarHeight = 60;
   bool _dbIsReady = false;
   Widget _activeWidget;
@@ -51,7 +51,7 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
   Widget build(BuildContext context) {
     return !_dbIsReady
         ? Center(
-            child: CircularProgressIndicator(),
+            child: const CircularProgressIndicator(),
           )
         : Stack(
             children: <Widget>[
@@ -92,10 +92,15 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
   }
 }
 
+/// Navigation page
 class GeoCrudNavigationPage extends StatefulWidget {
+  /// Default constructor
   GeoCrudNavigationPage({@required this.db, this.markersTrailingBuilder});
 
+  /// The dataabase
   final Db db;
+
+  /// The trailing widget builder
   final ItemWidgetBuilder markersTrailingBuilder;
 
   @override

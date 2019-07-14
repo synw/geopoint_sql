@@ -37,12 +37,11 @@ class _CrudPageState extends State<CrudPage> {
         _trailingBuilder = markersTrailingBuilder;
     }
     bloc = SelectBloc(database: db, table: table, where: where, reactive: true);
-    if (!_dbIsReady)
+    if (!_dbIsReady) {
       db.onReady.then((_) {
-        setState(() {
-          _dbIsReady = true;
-        });
+        setState(() => _dbIsReady = true);
       });
+    }
     print("TRAILING $_trailingBuilder");
     print("TYPE $type");
     super.initState();
@@ -58,7 +57,7 @@ class _CrudPageState extends State<CrudPage> {
   Widget build(BuildContext context) {
     return !_dbIsReady
         ? Center(
-            child: CircularProgressIndicator(),
+            child: const CircularProgressIndicator(),
           )
         : Stack(children: <Widget>[
             CrudView(
@@ -69,12 +68,19 @@ class _CrudPageState extends State<CrudPage> {
   }
 }
 
+/// An admin page
 class CrudPage extends StatefulWidget {
+  /// Default constructor
   CrudPage(
       {@required this.db, @required this.type, this.markersTrailingBuilder});
 
+  /// The database
   final Db db;
+
+  /// The type of geoserie
   final String type;
+
+  /// The trailing builder function
   final ItemWidgetBuilder markersTrailingBuilder;
 
   @override

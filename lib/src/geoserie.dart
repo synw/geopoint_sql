@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:sqlcool/sqlcool.dart';
 
-dbSaveGeoSerie(
+/// Save a geoserie in the database
+void dbSaveGeoSerie(
     {@required Db database, GeoSerie geoSerie, bool verbose = false}) async {
   /// save a serie into a database
   /// [database] is the database to use
@@ -10,20 +11,21 @@ dbSaveGeoSerie(
   if (verbose) {
     print("SAVING the ${geoSerie.name} ${geoSerie.typeStr} serie");
   }
-  Map<String, String> row = geoSerie.toMap(withId: false);
+  final row = geoSerie.toMap(withId: false);
   try {
     await database
         .insert(table: "geoserie", row: row, verbose: verbose)
-        .catchError((e) {
+        .catchError((dynamic e) {
       throw (e);
     });
   } catch (e) {
-    throw (e);
+    rethrow;
   }
 }
 
-dbUpdateGeoSerie(
-    {@required database, GeoSerie geoSerie, bool verbose = false}) async {
+/// Update a geoserie
+void dbUpdateGeoSerie(
+    {@required Db database, GeoSerie geoSerie, bool verbose = false}) async {
   /// save a serie into a database
   /// [database] is the database to use
   /// [verbose] print query info
@@ -36,13 +38,14 @@ dbUpdateGeoSerie(
           row: geoSerie.toMap(withId: false),
           where: "id=${geoSerie.id}",
           verbose: verbose)
-      .catchError((e) {
+      .catchError((dynamic e) {
     throw (e);
   });
 }
 
-dbDeleteGeoSerie(
-    {@required database, GeoSerie geoSerie, bool verbose = false}) async {
+/// Delete a geoserie
+void dbDeleteGeoSerie(
+    {@required Db database, GeoSerie geoSerie, bool verbose = false}) async {
   /// delete a serie from a database
   /// [database] is the database to use
   /// [verbose] print query info
@@ -51,7 +54,7 @@ dbDeleteGeoSerie(
   }
   await database
       .delete(table: "geoserie", where: "id=${geoSerie.id}", verbose: verbose)
-      .catchError((e) {
+      .catchError((dynamic e) {
     throw (e);
   });
 }
