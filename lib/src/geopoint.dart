@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 import 'package:geopoint/geopoint.dart';
 
+/// Save a geopoint in the database
 Future<GeoPoint> saveGeoPoint(
     {@required geoPoint,
     @required database,
@@ -28,29 +28,7 @@ Future<GeoPoint> saveGeoPoint(
   return gp;
 }
 
-Future<GeoPoint> saveCurrentPosition(
-    {@required Db database,
-    String name,
-    int serieId,
-    bool withAddress,
-    bool verbose}) async {
-  if (database == null) throw ArgumentError("Database must not be null");
-  verbose = verbose ?? false;
-  GeoPoint _gp = await GeoPoint.getPosition(name: name).catchError((e) {
-    throw (e);
-  });
-  GeoPoint gp = await _dbSaveGeoPoint(
-          database: database,
-          geoPoint: _gp,
-          withAddress: withAddress,
-          serieId: serieId,
-          verbose: verbose)
-      .catchError((e) {
-    throw (e);
-  });
-  return gp;
-}
-
+/// Save a geopoint image
 Future<void> saveGeoPointImage(
     {@required Db database,
     String path,
@@ -74,6 +52,7 @@ Future<void> saveGeoPointImage(
   });
 }
 
+/// Get images for a geopoint
 Future<List<File>> getGeoPointImages(
     {@required Db database, @required int geoPointId}) async {
   if (database == null) throw ArgumentError("Database must not be null");
@@ -94,12 +73,6 @@ Future<GeoPoint> _dbSaveGeoPoint(
     bool withAddress,
     int serieId,
     verbose}) async {
-  /// get a geopoint and record it into the database
-  /// [name] the geopoint identifier
-  /// [database] the Db to save into
-  /// [withAddress] add the address information
-  /// [verbose] print info
-  /// Returns the geopoint with it's id set
   if (database == null) throw ArgumentError("Database must not be null");
   if (geoPoint == null) throw ArgumentError("geoPoint must not be null");
   withAddress = withAddress ?? false;
@@ -130,7 +103,7 @@ Future<int> _saveGeoPoint(
         "SAVING GEOPOINT ${geoPoint.latitude}/${geoPoint.longitude} INTO DB $database");
   }
   int id;
-  Map<String, String> row = geoPoint.toStringsMap(withId: false);
+  Map<String, String> row = geoPoint.toMap(withId: false);
   try {
     if (serieId != null) {
       row["geoserie"] = "$serieId";

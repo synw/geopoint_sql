@@ -3,16 +3,19 @@ import 'package:sqlcool/sqlcool.dart';
 import 'package:sqlview/sqlview.dart';
 
 class _CrudPageState extends State<CrudPage> {
-  _CrudPageState({@required this.db, @required this.type}) {
+  _CrudPageState(
+      {@required this.db, @required this.type, this.markersTrailingBuilder}) {
     if (db == null) throw (ArgumentError.notNull());
     _dbIsReady = db.isReady;
   }
 
   final Db db;
   final String type;
+  final ItemWidgetBuilder markersTrailingBuilder;
 
   SelectBloc bloc;
   bool _dbIsReady;
+  ItemWidgetBuilder _trailingBuilder;
 
   @override
   void initState() {
@@ -31,20 +34,17 @@ class _CrudPageState extends State<CrudPage> {
       case "marker":
         where = "geoserie_id IS NULL";
         table = "geopoint";
+        _trailingBuilder = markersTrailingBuilder;
     }
-    bloc = SelectBloc(
-        database: db,
-        table: table,
-        where: where,
-        limit: 100,
-        reactive: true,
-        verbose: true);
+    bloc = SelectBloc(database: db, table: table, where: where, reactive: true);
     if (!_dbIsReady)
       db.onReady.then((_) {
         setState(() {
           _dbIsReady = true;
         });
       });
+    print("TRAILING $_trailingBuilder");
+    print("TYPE $type");
     super.initState();
   }
 
@@ -63,17 +63,21 @@ class _CrudPageState extends State<CrudPage> {
         : Stack(children: <Widget>[
             CrudView(
               bloc: bloc,
+              trailingBuilder: _trailingBuilder,
             ),
           ]);
   }
 }
 
 class CrudPage extends StatefulWidget {
-  CrudPage({@required this.db, @required this.type});
+  CrudPage(
+      {@required this.db, @required this.type, this.markersTrailingBuilder});
 
   final Db db;
   final String type;
+  final ItemWidgetBuilder markersTrailingBuilder;
 
   @override
-  _CrudPageState createState() => _CrudPageState(db: db, type: type);
+  _CrudPageState createState() => _CrudPageState(
+      db: db, type: type, markersTrailingBuilder: markersTrailingBuilder);
 }

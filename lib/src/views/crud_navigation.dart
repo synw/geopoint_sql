@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
 import 'package:circular_bottom_navigation/circular_bottom_navigation.dart';
 import 'package:circular_bottom_navigation/tab_item.dart';
+import 'package:sqlview/sqlview.dart';
 import 'markers.dart';
 import 'groups.dart';
 import 'lines.dart';
 import 'polygons.dart';
 
 class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
-  _GeoCrudNavigationPageState({@required this.db}) {
+  _GeoCrudNavigationPageState(
+      {@required this.db, this.markersTrailingBuilder}) {
     if (db == null) throw (ArgumentError.notNull());
     _activeWidget = MarkersCrudPage(
       db: db,
+      markersTrailingBuilder: markersTrailingBuilder,
     );
   }
 
   final Db db;
+  final ItemWidgetBuilder markersTrailingBuilder;
 
   SelectBloc bloc;
   int _selectedPos = 3;
@@ -75,7 +79,9 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
                             _activeWidget = GroupsCrudPage(db: db);
                             break;
                           case 3:
-                            _activeWidget = MarkersCrudPage(db: db);
+                            _activeWidget = MarkersCrudPage(
+                                db: db,
+                                markersTrailingBuilder: markersTrailingBuilder);
                             break;
                         }
                       });
@@ -87,11 +93,12 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
 }
 
 class GeoCrudNavigationPage extends StatefulWidget {
-  GeoCrudNavigationPage({@required this.db});
+  GeoCrudNavigationPage({@required this.db, this.markersTrailingBuilder});
 
   final Db db;
+  final ItemWidgetBuilder markersTrailingBuilder;
 
   @override
-  _GeoCrudNavigationPageState createState() =>
-      _GeoCrudNavigationPageState(db: db);
+  _GeoCrudNavigationPageState createState() => _GeoCrudNavigationPageState(
+      db: db, markersTrailingBuilder: markersTrailingBuilder);
 }
