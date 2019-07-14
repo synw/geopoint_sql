@@ -1,7 +1,44 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 
-/// The geo database sql schema
+/// The geopoint database sql schema
+final geoPointSchema = DbTable("geopoint")
+  ..varchar("name")
+  ..varchar("slug", unique: true, nullable: true)
+  ..timestamp()
+  ..real("latitude")
+  ..real("longitude")
+  ..real("speed", nullable: true)
+  ..real("altitude", nullable: true)
+  ..real("heading", nullable: true)
+  ..real("accuracy", nullable: true)
+  ..real("speed_accuracy", nullable: true)
+  ..varchar("number", nullable: true)
+  ..varchar("street", nullable: true)
+  ..varchar("locality", nullable: true)
+  ..varchar("sublocality", nullable: true)
+  ..varchar("postal_code", nullable: true)
+  ..varchar('region', nullable: true)
+  ..varchar("subregion", nullable: true)
+  ..varchar("country", nullable: true);
+
+/// The geoserie database schema
+final geoSerieSchema = DbTable("geoserie")
+  ..varchar("name", unique: true)
+  ..varchar("type", check: 'type = "group" or type = "line" or type="polygon"')
+  ..real("surface", nullable: true)
+  ..foreignKey("centroid",
+      reference: "geopoint", onDelete: OnDelete.cascade, nullable: true)
+  ..foreignKey("boudaries",
+      reference: "geoserie", onDelete: OnDelete.cascade, nullable: true);
+
+/// The geopoint image database schema
+final geoPointImageSchema = DbTable("geopoint_image")
+  ..varchar('path', nullable: true)
+  ..varchar("url",
+      nullable: true, check: "path IS NOT NULL OR (url IS NOT NULL))")
+  ..foreignKey("geopoint");
+
 var geoDbSchema = const <String>[
   """CREATE TABLE geopoint (
     id INTEGER PRIMARY KEY,
@@ -40,8 +77,20 @@ var geoDbSchema = const <String>[
     CHECK(path IS NOT NULL OR (url IS NOT NULL)))""",
   """CREATE TABLE geoserie (
     id INTEGER PRIMARY KEY,
-    name VARCHAR(30) NOT NULL,
-    type CHECK(type = "group" or type = "line" or type="polygon"))"""
+    name VARCHAR(30) NOT NULL,    
+    type CHECK(type = "group" or type = "line" or type="polygon"),
+    surface REAL,
+    centroid_id INTEGER,
+    boundaries_id INTEGER,
+    CONSTRAINT centroid
+        FOREIGN KEY (centroid_id)
+        REFERENCES geopoint(id)
+        ON DELETE CASCADE,
+    CONSTRAINT boundaries
+        FOREIGN KEY (boundaries_id)
+        REFERENCES geoserie(id)
+        ON DELETE CASCADE
+    )"""
 ];
 
 initGeoDb(
