@@ -1,60 +1,111 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:sqlcool/sqlcool.dart';
+import 'package:geojson/geojson.dart';
 
-/// Save a geoserie in the database
-void dbSaveGeoSerie(
-    {@required Db database, GeoSerie geoSerie, bool verbose = false}) async {
-  /// save a serie into a database
-  /// [database] is the database to use
-  /// [verbose] print query info
-  if (verbose) {
-    print("SAVING the ${geoSerie.name} ${geoSerie.typeStr} serie");
+/// The class that manages the [GeoSerie] db operations
+class GeoSerieSql {
+  /// Provide a [Db]
+  GeoSerieSql({@required this.db, this.verbose = false});
+
+  /// The Sqlcool database to use
+  final Db db;
+
+  /// Verbosity
+  final bool verbose;
+
+  /// Save geoseries from a geojson file
+  Future<void> saveFromGeoJsonFile(File file, {String nameProperty}) async {
+    List<GeoSerie> geoSeries;
+    try {
+      geoSeries =
+          await geoSerieFromGeoJsonFile(file, nameProperty: nameProperty);
+    } catch (e) {
+      throw ("Can not parse file $e");
+    }
+    for (final geoSerie in geoSeries) {
+      save(geoSerie);
+    }
   }
-  final row = geoSerie.toMap(withId: false);
-  try {
-    await database
-        .insert(table: "geoserie", row: row, verbose: verbose)
+
+  /// Save geoseries from a geojson string
+  Future<void> saveFromGeoJson(String data, {String nameProperty}) async {
+    List<GeoSerie> geoSeries;
+    try {
+      geoSeries = await geoSerieFromGeoJson(data, nameProperty: nameProperty);
+    } catch (e) {
+      throw ("Can not parse file $e");
+    }
+    for (final geoSerie in geoSeries) {
+      await save(geoSerie);
+    }
+  }
+
+  /// Save a geoserie in the db
+  void save(GeoSerie geoSerie) async {
+    if (verbose) {
+      print("Saving serie ${geoSerie.name} ${geoSerie.typeStr}");
+    }
+    final row = Map<String, String>.from(geoSerie.toMap(withId: false));
+    int id;
+    try {
+      id = await db
+          .insert(table: "geoserie", row: row, verbose: verbose)
+          .catchError((dynamic e) {
+        throw (e);
+      });
+    } catch (e) {
+      rethrow;
+    }
+    // save the geopoints in the serie
+    final rows = <Map<String, String>>[];
+    var i = 0;
+    for (final geoPoint in geoSerie.geoPoints) {
+      final gp = geoPoint.toStringsMap(withId: false);
+      gp["geoserie"] = "$id";
+      if (gp["name"] == null) {
+        gp["name"] = "Geopoint $i";
+      }
+      rows.add(gp);
+      ++i;
+    }
+    if (verbose) {
+      print("Saving ${rows.length} geopoints for serie");
+    }
+    try {
+      await db.batchInsert(table: "geopoint", rows: rows, verbose: verbose);
+    } catch (e) {
+      throw ("Can not insert geopoints $e");
+    }
+  }
+
+  /// Update a geoserie
+  void update(GeoSerie geoSerie) async {
+    if (verbose) {
+      print("Updating the ${geoSerie.name} ${geoSerie.typeStr} serie");
+    }
+    final row = Map<String, String>.from(geoSerie.toMap(withId: false));
+    await db
+        .update(
+            table: "geoserie",
+            row: row,
+            where: "id=${geoSerie.id}",
+            verbose: verbose)
         .catchError((dynamic e) {
       throw (e);
     });
-  } catch (e) {
-    rethrow;
   }
-}
 
-/// Update a geoserie
-void dbUpdateGeoSerie(
-    {@required Db database, GeoSerie geoSerie, bool verbose = false}) async {
-  /// save a serie into a database
-  /// [database] is the database to use
-  /// [verbose] print query info
-  if (verbose) {
-    print("Updating the ${geoSerie.name} ${geoSerie.typeStr} serie");
+  /// Delete a geoserie
+  void delete(GeoSerie geoSerie) async {
+    if (verbose) {
+      print("Deleting the ${geoSerie.name} ${geoSerie.typeStr} serie");
+    }
+    await db
+        .delete(table: "geoserie", where: "id=${geoSerie.id}", verbose: verbose)
+        .catchError((dynamic e) {
+      throw (e);
+    });
   }
-  await database
-      .update(
-          table: "geoserie",
-          row: geoSerie.toMap(withId: false),
-          where: "id=${geoSerie.id}",
-          verbose: verbose)
-      .catchError((dynamic e) {
-    throw (e);
-  });
-}
-
-/// Delete a geoserie
-void dbDeleteGeoSerie(
-    {@required Db database, GeoSerie geoSerie, bool verbose = false}) async {
-  /// delete a serie from a database
-  /// [database] is the database to use
-  /// [verbose] print query info
-  if (verbose) {
-    print("Deleting the ${geoSerie.name} ${geoSerie.typeStr} serie");
-  }
-  await database
-      .delete(table: "geoserie", where: "id=${geoSerie.id}", verbose: verbose)
-      .catchError((dynamic e) {
-    throw (e);
-  });
 }

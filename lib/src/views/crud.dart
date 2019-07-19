@@ -3,15 +3,13 @@ import 'package:sqlcool/sqlcool.dart';
 import 'package:sqlview/sqlview.dart';
 
 class _CrudPageState extends State<CrudPage> {
-  _CrudPageState(
-      {@required this.db, @required this.type, this.markersTrailingBuilder}) {
+  _CrudPageState({@required this.db, @required this.type}) {
     if (db == null) throw (ArgumentError.notNull());
     _dbIsReady = db.isReady;
   }
 
   final Db db;
   final String type;
-  final ItemWidgetBuilder markersTrailingBuilder;
 
   SelectBloc bloc;
   bool _dbIsReady;
@@ -31,16 +29,13 @@ class _CrudPageState extends State<CrudPage> {
       case "polygon":
         where = 'type = "polygon"';
         break;
-      case "marker":
-        where = "geoserie_id IS NULL";
+      case "point":
+        where = "geoserie IS NULL";
         table = "geopoint";
-        _trailingBuilder = markersTrailingBuilder;
     }
     bloc = SelectBloc(database: db, table: table, where: where, reactive: true);
     if (!_dbIsReady) {
-      db.onReady.then((_) {
-        setState(() => _dbIsReady = true);
-      });
+      db.onReady.then((_) => setState(() => _dbIsReady = true));
     }
     print("TRAILING $_trailingBuilder");
     print("TYPE $type");
@@ -60,10 +55,7 @@ class _CrudPageState extends State<CrudPage> {
             child: const CircularProgressIndicator(),
           )
         : Stack(children: <Widget>[
-            CrudView(
-              bloc: bloc,
-              trailingBuilder: _trailingBuilder,
-            ),
+            CrudView(bloc: bloc),
           ]);
   }
 }
@@ -71,8 +63,7 @@ class _CrudPageState extends State<CrudPage> {
 /// An admin page
 class CrudPage extends StatefulWidget {
   /// Default constructor
-  CrudPage(
-      {@required this.db, @required this.type, this.markersTrailingBuilder});
+  CrudPage({@required this.db, @required this.type});
 
   /// The database
   final Db db;
@@ -80,10 +71,6 @@ class CrudPage extends StatefulWidget {
   /// The type of geoserie
   final String type;
 
-  /// The trailing builder function
-  final ItemWidgetBuilder markersTrailingBuilder;
-
   @override
-  _CrudPageState createState() => _CrudPageState(
-      db: db, type: type, markersTrailingBuilder: markersTrailingBuilder);
+  _CrudPageState createState() => _CrudPageState(db: db, type: type);
 }

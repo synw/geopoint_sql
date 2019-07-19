@@ -1,109 +1,132 @@
 import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
-import 'package:circular_bottom_navigation/circular_bottom_navigation.dart';
-import 'package:circular_bottom_navigation/tab_item.dart';
-import 'package:sqlview/sqlview.dart';
-import 'markers.dart';
+import 'geopoint.dart';
 import 'groups.dart';
 import 'lines.dart';
 import 'polygons.dart';
 
+/// The active tab when the page opens
+enum ActiveTab {
+  /// Activate the polygons tab
+  polygon,
+
+  /// Activate the lines tab
+  line,
+
+  /// Activate the groups tab
+  group,
+
+  /// Activate the points tab
+  point
+}
+
 class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
   _GeoCrudNavigationPageState(
-      {@required this.db, this.markersTrailingBuilder}) {
+      {@required this.db, this.appBar, this.activeTab}) {
     if (db == null) throw (ArgumentError.notNull());
-    _activeWidget = MarkersCrudPage(
-      db: db,
-      markersTrailingBuilder: markersTrailingBuilder,
-    );
+    _getActiveTab();
   }
 
   final Db db;
-  final ItemWidgetBuilder markersTrailingBuilder;
+  final AppBar appBar;
+  final ActiveTab activeTab;
 
-  SelectBloc bloc;
-  final _selectedPos = 3;
-  double bottomNavBarHeight = 60;
+  int _currentIndex;
   bool _dbIsReady = false;
-  Widget _activeWidget;
-
-  List<TabItem> tabItems = List.of([
-    TabItem(Icons.signal_cellular_null, "Polygons", Colors.deepPurple),
-    TabItem(Icons.trending_up, "Lines", Colors.green),
-    TabItem(Icons.bubble_chart, "Groups", Colors.red),
-    TabItem(Icons.location_on, "Markers", Colors.blue),
-  ]);
-
-  CircularBottomNavigationController _navigationController;
 
   @override
   void initState() {
-    _navigationController = CircularBottomNavigationController(_selectedPos);
     db.onReady.then((_) {
-      setState(() {
-        _dbIsReady = true;
-      });
+      setState(() => _dbIsReady = true);
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return !_dbIsReady
-        ? Center(
-            child: const CircularProgressIndicator(),
-          )
-        : Stack(
-            children: <Widget>[
-              Padding(
-                child: _activeWidget,
-                padding: EdgeInsets.only(bottom: bottomNavBarHeight),
-              ),
-              Align(
-                  alignment: Alignment.bottomCenter,
-                  child: CircularBottomNavigation(
-                    tabItems,
-                    selectedPos: _selectedPos,
-                    controller: _navigationController,
-                    barHeight: bottomNavBarHeight,
-                    selectedCallback: (int selectedPos) {
-                      setState(() {
-                        switch (_navigationController.value) {
-                          case 0:
-                            _activeWidget = PolygonsCrudPage(db: db);
-                            break;
-                          case 1:
-                            _activeWidget = LinesCrudPage(db: db);
-                            break;
-                          case 2:
-                            _activeWidget = GroupsCrudPage(db: db);
-                            break;
-                          case 3:
-                            _activeWidget = MarkersCrudPage(
-                                db: db,
-                                markersTrailingBuilder: markersTrailingBuilder);
-                            break;
-                        }
-                      });
-                    },
-                  ))
-            ],
-          );
+    final List<Widget> _children = [
+      PolygonsCrudPage(db: db),
+      LinesCrudPage(db: db),
+      GroupsCrudPage(db: db),
+      GeoPointCrudPage(db: db)
+    ];
+    final body = _children[_currentIndex];
+    final bottomBar = BottomNavigationBar(
+      showUnselectedLabels: true,
+      onTap: onTabTapped, // new
+      currentIndex: _currentIndex,
+      items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+            icon: Icon(Icons.signal_cellular_null, color: Colors.deepPurple),
+            title: const Text("Polygons")),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.trending_up, color: Colors.green),
+            title: const Text("Lines")),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.bubble_chart, color: Colors.red),
+            title: const Text("Groups")),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.location_on, color: Colors.blue),
+            title: const Text("Points")),
+      ],
+    );
+    Widget w;
+    if (appBar != null) {
+      w = Scaffold(
+          appBar: appBar,
+          body: _dbIsReady
+              ? body
+              : const Center(child: CircularProgressIndicator()),
+          bottomNavigationBar: bottomBar);
+    } else {
+      w = Scaffold(
+          body: _dbIsReady
+              ? SafeArea(child: body)
+              : const Center(child: CircularProgressIndicator()),
+          bottomNavigationBar: bottomBar);
+    }
+    return w;
+  }
+
+  void onTabTapped(int index) {
+    setState(() => _currentIndex = index);
+  }
+
+  void _getActiveTab() {
+    switch (activeTab) {
+      case ActiveTab.polygon:
+        _currentIndex = 0;
+        break;
+      case ActiveTab.line:
+        _currentIndex = 1;
+        break;
+      case ActiveTab.group:
+        _currentIndex = 2;
+        break;
+      case ActiveTab.point:
+        _currentIndex = 3;
+        break;
+      default:
+        _currentIndex = 3;
+    }
   }
 }
 
 /// Navigation page
 class GeoCrudNavigationPage extends StatefulWidget {
   /// Default constructor
-  GeoCrudNavigationPage({@required this.db, this.markersTrailingBuilder});
+  GeoCrudNavigationPage({@required this.db, this.appBar, this.activeTab});
 
   /// The dataabase
   final Db db;
 
-  /// The trailing widget builder
-  final ItemWidgetBuilder markersTrailingBuilder;
+  /// The appbar to use
+  final AppBar appBar;
+
+  /// The active tab
+  final ActiveTab activeTab;
 
   @override
-  _GeoCrudNavigationPageState createState() => _GeoCrudNavigationPageState(
-      db: db, markersTrailingBuilder: markersTrailingBuilder);
+  _GeoCrudNavigationPageState createState() =>
+      _GeoCrudNavigationPageState(db: db, appBar: appBar, activeTab: activeTab);
 }

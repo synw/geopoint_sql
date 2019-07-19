@@ -19,11 +19,13 @@ final geoPointSchema = DbTable("geopoint")
   ..varchar("postal_code", nullable: true)
   ..varchar('region', nullable: true)
   ..varchar("subregion", nullable: true)
-  ..varchar("country", nullable: true);
+  ..varchar("country", nullable: true)
+  ..foreignKey("geoserie", nullable: true);
 
 /// The geoserie database schema
 final geoSerieSchema = DbTable("geoserie")
-  ..varchar("name", unique: true)
+  ..varchar("name")
+  ..varchar("slug", unique: true, nullable: true)
   ..varchar("type", check: 'type = "group" or type = "line" or type="polygon"')
   ..real("surface", nullable: true)
   ..foreignKey("centroid",
