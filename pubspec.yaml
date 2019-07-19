@@ -1,12 +1,7 @@
 name: geopoint_sql
-description: A new Flutter project.
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# Read more about versioning at semver.org.
+description: Sql operations for geospatial data. Admin view for geopoint and geoserie.
+author: synw <ansterj@gmail.com>
+homepage: https://github.com/synw/geopoint_sql
 version: 0.1.0
 
 environment:
@@ -15,12 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  geopoint: ^0.2.2
+  geopoint: ^0.4.0
   sqlcool: ^3.1.0
-  sqlview:
-    path: ../sqlview
-  circular_bottom_navigation: ^1.0.0
-  pedantic: ^1.7.0
+  sqlview: ^0.3.0
+  geojson: ^0.1.0
+  pedantic: ^1.6.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
