@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   geopoint: ^0.4.0
-  sqlcool: ^3.1.0
+  sqlcool: ^3.2.0
   sqlview: ^0.3.0
   pedantic: ^1.6.0
 
