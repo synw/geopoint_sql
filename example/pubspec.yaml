@@ -19,6 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  geojson: ^0.2.1
   geopoint_sql:
     path: ../
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geopoint_sql/geopoint_sql.dart';
+import 'package:geojson/geojson.dart';
 import 'conf.dart';
 
 class _GeoCrudPageState extends State<GeoCrudPage> {
@@ -24,9 +25,16 @@ class _GeoCrudPageState extends State<GeoCrudPage> {
       print("Loading data...");
       final fileName = "railroads_of_north_america.geojson";
       final data = await rootBundle.loadString("assets/$fileName");
-      await geoSerieSql.saveFromGeoJson(data).catchError((dynamic e) {
-        throw ("Can not save geoserie from file $e");
-      });
+      final geoSerieSql = GeoSerieSql(db: geoDb, verbose: true);
+
+      /// Use the [geojson] package to parse the data
+      final features = featuresFromGeoJson(data);
+      for (final feature in features.collection) {
+        final line = feature.geometry as Line;
+
+        /// Save the data
+        geoSerieSql.save(line.geoSerie);
+      }
       final geoSeries = await geoDb.count(table: "geoserie");
       final geoPoints = await geoDb.count(table: "geopoint");
       print("Saved $geoPoints geopoints in $geoSeries series");
