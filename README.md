@@ -1,5 +1,7 @@
 # Geopoint Sql
 
+[![pub package](https://img.shields.io/pub/v/geopoint_sql.svg)](https://pub.dartlang.org/packages/geopoint_sql)
+
 Sql operations for geospatial data. Uses [Geopoint](https://github.com/synw/geopoint) and [Geojson](https://github.com/synw/geojson) for data structures and [Sqlcool](https://github.com/synw/sqlcool) for database management.
 
 ## Documentation
