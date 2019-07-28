@@ -21,20 +21,6 @@ Sql operations for geospatial data. Uses [Geopoint](https://github.com/synw/geop
       });
    ```
 
-### Save data in the database from a geojson file
-
-   ```dart
-   import 'package:flutter/services.dart' show rootBundle;
-   import 'package:geopoint_sql/geopoint_sql.dart';
-
-   final fileName = "railroads_of_north_america.geojson";
-   final data = await rootBundle.loadString("assets/$fileName");
-   final geoSerieSql = GeoSerieSql(db: geoDb);
-   await geoSerieSql.saveFromGeoJson(data).catchError((dynamic e) {
-      throw ("Can not save geoserie from file $e");
-   });
-   ```
-
 ### Crud operations
 
 For geopoints:
@@ -45,7 +31,7 @@ For geopoints:
    final geoPointSql = GeoPointSql(db: geoDb);
    // save
    geoPointSql.save(
-      geopoint: GeoPoint(name: "point", latitude: 0.0, longitude: 0.0));
+      geoPoint: GeoPoint(name: "point", latitude: 0.0, longitude: 0.0));
    ```
 
 For geoseries:
@@ -56,10 +42,10 @@ For geoseries:
    final geoSerieSql = GeoSerieSql(db: geoDb);
    // save
    geoSerieSql.save(
-      geopoint: GeoSerie(name: "point", geoPoints: <GeoPoint>[]));
+      geoSerie: GeoSerie(name: "serie1", geoPoints: <GeoPoint>[]));
    // update
    geoSerieSql.update(
-      geopoint: GeoSerie(name: "point", geoPoints: <GeoPoint>[]));
+      geoSerie: GeoSerie(name: "serie1", geoPoints: <GeoPoint>[]));
    // delete
    geoSerieSql.delete(someExistingGeoserie);
    ```
