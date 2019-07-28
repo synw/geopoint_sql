@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:sqlcool/sqlcool.dart';
-import 'package:geojson/geojson.dart';
 
 /// The class that manages the [GeoSerie] db operations
 class GeoSerieSql {
@@ -14,33 +12,6 @@ class GeoSerieSql {
 
   /// Verbosity
   final bool verbose;
-
-  /// Save geoseries from a geojson file
-  Future<void> saveFromGeoJsonFile(File file, {String nameProperty}) async {
-    List<GeoSerie> geoSeries;
-    try {
-      geoSeries =
-          await geoSerieFromGeoJsonFile(file, nameProperty: nameProperty);
-    } catch (e) {
-      throw ("Can not parse file $e");
-    }
-    for (final geoSerie in geoSeries) {
-      save(geoSerie);
-    }
-  }
-
-  /// Save geoseries from a geojson string
-  Future<void> saveFromGeoJson(String data, {String nameProperty}) async {
-    List<GeoSerie> geoSeries;
-    try {
-      geoSeries = await geoSerieFromGeoJson(data, nameProperty: nameProperty);
-    } catch (e) {
-      throw ("Can not parse file $e");
-    }
-    for (final geoSerie in geoSeries) {
-      await save(geoSerie);
-    }
-  }
 
   /// Save a geoserie in the db
   void save(GeoSerie geoSerie) async {
