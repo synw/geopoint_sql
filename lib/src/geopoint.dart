@@ -86,7 +86,7 @@ class GeoPointSql {
           "SAVING GEOPOINT ${geoPoint.latitude}/${geoPoint.longitude} INTO DB $db");
     }
     int id;
-    final row = geoPoint.toMap(withId: false) as Map<String, String>;
+    final row = geoPoint.toStringsMap(withId: false);
     try {
       if (serieId != null) {
         row["geoserie"] = "$serieId";
