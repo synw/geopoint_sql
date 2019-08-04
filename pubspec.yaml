@@ -2,7 +2,7 @@ name: geopoint_sql
 description: Sql operations for geospatial data. Admin view for geopoint and geoserie.
 author: synw <ansterj@gmail.com>
 homepage: https://github.com/synw/geopoint_sql
-version: 0.1.0
+version: 0.1.1
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
