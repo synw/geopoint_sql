@@ -37,5 +37,5 @@ final geoSerieSchema = DbTable("geoserie")
 final geoPointImageSchema = DbTable("geopoint_image")
   ..varchar('path', nullable: true)
   ..varchar("url",
-      nullable: true, check: "path IS NOT NULL OR (url IS NOT NULL))")
+      nullable: true, check: "path IS NOT NULL OR (url IS NOT NULL)")
   ..foreignKey("geopoint");
