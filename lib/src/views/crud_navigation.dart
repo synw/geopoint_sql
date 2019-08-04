@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
+import 'package:sqlview/sqlview.dart';
 import 'geopoint.dart';
 import 'groups.dart';
 import 'lines.dart';
@@ -22,7 +23,10 @@ enum ActiveTab {
 
 class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
   _GeoCrudNavigationPageState(
-      {@required this.db, this.appBar, this.activeTab}) {
+      {@required this.db,
+      this.appBar,
+      this.activeTab,
+      this.markersTrailingBuilder}) {
     if (db == null) throw (ArgumentError.notNull());
     _getActiveTab();
   }
@@ -30,6 +34,7 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
   final Db db;
   final AppBar appBar;
   final ActiveTab activeTab;
+  final ItemWidgetBuilder markersTrailingBuilder;
 
   int _currentIndex;
   bool _dbIsReady = false;
@@ -48,7 +53,7 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
       PolygonsCrudPage(db: db),
       LinesCrudPage(db: db),
       GroupsCrudPage(db: db),
-      GeoPointCrudPage(db: db)
+      GeoPointCrudPage(db: db, markersTrailingBuilder: markersTrailingBuilder)
     ];
     final body = _children[_currentIndex];
     final bottomBar = BottomNavigationBar(
@@ -115,7 +120,11 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
 /// Navigation page
 class GeoCrudNavigationPage extends StatefulWidget {
   /// Default constructor
-  GeoCrudNavigationPage({@required this.db, this.appBar, this.activeTab});
+  GeoCrudNavigationPage(
+      {@required this.db,
+      this.appBar,
+      this.activeTab,
+      this.markersTrailingBuilder});
 
   /// The dataabase
   final Db db;
@@ -126,7 +135,13 @@ class GeoCrudNavigationPage extends StatefulWidget {
   /// The active tab
   final ActiveTab activeTab;
 
+  /// The trailing widget for markers
+  final ItemWidgetBuilder markersTrailingBuilder;
+
   @override
-  _GeoCrudNavigationPageState createState() =>
-      _GeoCrudNavigationPageState(db: db, appBar: appBar, activeTab: activeTab);
+  _GeoCrudNavigationPageState createState() => _GeoCrudNavigationPageState(
+      db: db,
+      appBar: appBar,
+      activeTab: activeTab,
+      markersTrailingBuilder: markersTrailingBuilder);
 }

@@ -41,7 +41,7 @@ class GeoPointSql {
     final row = <String, String>{
       "path": path,
       "url": url,
-      "geopoint_id": "$geoPointId"
+      "geopoint": "$geoPointId"
     };
     await db
         .insert(table: "geopoint_image", row: row, verbose: verbose)

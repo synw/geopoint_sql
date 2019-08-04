@@ -18,8 +18,9 @@ class _GeoPointCrudPageState extends State<GeoPointCrudPage> {
 }
 
 class GeoPointCrudPage extends StatefulWidget {
-  GeoPointCrudPage({@required this.db});
+  GeoPointCrudPage({@required this.db, this.markersTrailingBuilder});
 
+  final ItemWidgetBuilder markersTrailingBuilder;
   final Db db;
 
   @override
