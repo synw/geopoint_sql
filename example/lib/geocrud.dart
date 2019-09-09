@@ -28,9 +28,9 @@ class _GeoCrudPageState extends State<GeoCrudPage> {
       final geoSerieSql = GeoSerieSql(db: geoDb, verbose: true);
 
       /// Use the [geojson] package to parse the data
-      final features = featuresFromGeoJson(data);
+      final features = await featuresFromGeoJson(data);
       for (final feature in features.collection) {
-        final line = feature.geometry as Line;
+        final GeoJsonLine line = feature.geometry as GeoJsonLine;
 
         /// Save the data
         geoSerieSql.save(line.geoSerie);
