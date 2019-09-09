@@ -1,26 +1,40 @@
 import 'package:sqlcool/sqlcool.dart';
 
+/// Create a geopoint schema for a given table name
+DbTable createGeoPointSchema({String tableName = "geopoint"}) {
+  final table = DbTable(tableName)
+    ..varchar("name")
+    ..varchar("slug", unique: true, nullable: true)
+    ..timestamp()
+    ..real("latitude")
+    ..real("longitude")
+    ..real("speed", nullable: true)
+    ..real("altitude", nullable: true)
+    ..real("heading", nullable: true)
+    ..real("accuracy", nullable: true)
+    ..real("speed_accuracy", nullable: true)
+    ..varchar("number", nullable: true)
+    ..varchar("street", nullable: true)
+    ..varchar("locality", nullable: true)
+    ..varchar("sublocality", nullable: true)
+    ..varchar("postal_code", nullable: true)
+    ..varchar('region', nullable: true)
+    ..varchar("subregion", nullable: true)
+    ..varchar("country", nullable: true)
+    ..foreignKey("geoserie", nullable: true);
+  return table;
+}
+
 /// The geopoint database sql schema
-final geoPointSchema = DbTable("geopoint")
+final geoPointSchema = createGeoPointSchema();
+
+/*
+/// The geopoint property schema
+final geoPointPropertySchema = DbTable("geopoint_property")
   ..varchar("name")
-  ..varchar("slug", unique: true, nullable: true)
-  ..timestamp()
-  ..real("latitude")
-  ..real("longitude")
-  ..real("speed", nullable: true)
-  ..real("altitude", nullable: true)
-  ..real("heading", nullable: true)
-  ..real("accuracy", nullable: true)
-  ..real("speed_accuracy", nullable: true)
-  ..varchar("number", nullable: true)
-  ..varchar("street", nullable: true)
-  ..varchar("locality", nullable: true)
-  ..varchar("sublocality", nullable: true)
-  ..varchar("postal_code", nullable: true)
-  ..varchar('region', nullable: true)
-  ..varchar("subregion", nullable: true)
-  ..varchar("country", nullable: true)
-  ..foreignKey("geoserie", nullable: true);
+  ..varchar("value", nullable: true)
+  ..varchar("type", check: 'type="int" or type="double" or type="string"')
+  ..foreignKey("geopoint", onDelete: OnDelete.cascade);*/
 
 /// The geoserie database schema
 final geoSerieSchema = DbTable("geoserie")
