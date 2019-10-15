@@ -2,7 +2,7 @@ name: geopoint_sql
 description: Sql operations for geospatial data. Admin view for geopoint and geoserie.
 author: synw <ansterj@gmail.com>
 homepage: https://github.com/synw/geopoint_sql
-version: 0.1.1
+version: 0.2.0
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -10,10 +10,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  geopoint: ^0.4.0
-  sqlcool: ^3.2.0
-  sqlview: ^0.3.0
   pedantic: ^1.6.0
+  geojson:
+    path: ../../../dart/geojson
+  slugify2: ^0.2.1
+  sqlview: 
+    path: ../sqlview
+  sqlcool:
+    path: ../sqlcool
+  geopoint:
+    path: ../../../dart/geopoint
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -4,7 +4,9 @@ import 'package:sqlview/sqlview.dart';
 
 class _CrudPageState extends State<CrudPage> {
   _CrudPageState({@required this.db, @required this.type}) {
-    if (db == null) throw (ArgumentError.notNull());
+    if (db == null) {
+      throw (ArgumentError.notNull("db"));
+    }
     _dbIsReady = db.isReady;
   }
 
@@ -18,7 +20,7 @@ class _CrudPageState extends State<CrudPage> {
   @override
   void initState() {
     String where;
-    String table = "geoserie";
+    var table = "geoserie";
     switch (type) {
       case "group":
         where = 'type = "group"';
