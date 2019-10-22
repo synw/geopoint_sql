@@ -4,7 +4,9 @@ import 'crud.dart';
 
 class _LinesCrudPageState extends State<LinesCrudPage> {
   _LinesCrudPageState({@required this.db}) {
-    if (db == null) throw (ArgumentError.notNull());
+    if (db == null) {
+      throw ArgumentError.notNull();
+    }
   }
 
   final Db db;
@@ -16,7 +18,7 @@ class _LinesCrudPageState extends State<LinesCrudPage> {
 }
 
 class LinesCrudPage extends StatefulWidget {
-  LinesCrudPage({@required this.db});
+  const LinesCrudPage({@required this.db});
 
   final Db db;
 

@@ -5,7 +5,9 @@ import 'crud.dart';
 
 class _GeoPointCrudPageState extends State<GeoPointCrudPage> {
   _GeoPointCrudPageState({@required this.db, this.markersTrailingBuilder}) {
-    if (db == null) throw (ArgumentError.notNull());
+    if (db == null) {
+      throw ArgumentError.notNull();
+    }
   }
 
   final Db db;
@@ -18,7 +20,7 @@ class _GeoPointCrudPageState extends State<GeoPointCrudPage> {
 }
 
 class GeoPointCrudPage extends StatefulWidget {
-  GeoPointCrudPage({@required this.db, this.markersTrailingBuilder});
+  const GeoPointCrudPage({@required this.db, this.markersTrailingBuilder});
 
   final ItemWidgetBuilder markersTrailingBuilder;
   final Db db;

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:sqlcool/sqlcool.dart';
+import '../exceptions.dart';
 
 /// A class that provides sql methods for [GeoSerie]
 class GeoSerieSql extends GeoSerie with DbModel {
@@ -76,10 +77,10 @@ class GeoSerieSql extends GeoSerie with DbModel {
             where: where,
             verbose: verbose)
         .catchError((dynamic e) {
-      throw ("Can not select from db $e");
+      throw DatabaseQueryError("Can not select from db $e");
     });
     if (res.length != 1) {
-      throw ("Found ${res.length} geoserie in database");
+      throw DatabaseQueryError("Found ${res.length} geoserie in database");
     }
     final gs = fromDb(res[0]);
     // geopoints
@@ -107,11 +108,13 @@ class GeoSerieSql extends GeoSerie with DbModel {
         .forEach((s) => geoSeriesRows.add(Map<String, String>.from(s.toMap())));
     await db
         .batchInsert(table: "geoserie", rows: geoSeriesRows, verbose: verbose)
-        .catchError((dynamic e) => throw ("Can not insert geoseries $e"));
+        .catchError((dynamic e) =>
+            throw DatabaseQueryError("Can not insert geoseries $e"));
     final geoPointRows = <Map<String, String>>[];
     geoPointsToSave.forEach((gp) => geoPointRows.add(gp.toStringsMap()));
     await db
         .batchInsert(table: "geopoint", rows: geoPointRows, verbose: verbose)
-        .catchError((dynamic e) => throw ("Can not insert geopoints $e"));
+        .catchError((dynamic e) =>
+            throw DatabaseQueryError("Can not insert geopoints $e"));
   }
 }

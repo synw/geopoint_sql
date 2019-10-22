@@ -4,7 +4,9 @@ import 'crud.dart';
 
 class _GroupsCrudPageState extends State<GroupsCrudPage> {
   _GroupsCrudPageState({@required this.db}) {
-    if (db == null) throw (ArgumentError.notNull());
+    if (db == null) {
+      throw ArgumentError.notNull();
+    }
   }
 
   final Db db;
@@ -16,7 +18,7 @@ class _GroupsCrudPageState extends State<GroupsCrudPage> {
 }
 
 class GroupsCrudPage extends StatefulWidget {
-  GroupsCrudPage({@required this.db});
+  const GroupsCrudPage({@required this.db});
 
   final Db db;
 

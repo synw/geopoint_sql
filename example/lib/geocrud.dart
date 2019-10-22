@@ -39,9 +39,9 @@ class _GeoCrudPageState extends State<GeoCrudPage> {
 
       /// Save the data
       await MyTimeSerieModel().batchSave(geoSeries: geoSeriesToSave);
-      final geoPoints =
+      final ngeoPoints =
           geoSeriesToSave.fold(0, (int v, gs) => v += gs.geoPoints.length);
-      print("Saved $geoPoints geopoints in ${geoSeriesToSave.length} series");
+      print("Saved $ngeoPoints geopoints in ${geoSeriesToSave.length} series");
     }
   }
 
