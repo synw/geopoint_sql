@@ -9,7 +9,9 @@ import 'package:geopoint/geopoint.dart';
 class GeoPointSql {
   /// Provide a [Db]
   GeoPointSql({@required this.db, this.verbose = false}) {
-    if (db == null) throw ArgumentError("Database must not be null");
+    if (db == null) {
+      throw ArgumentError("Database must not be null");
+    }
   }
 
   /// The Sqlcool db to use
@@ -21,7 +23,9 @@ class GeoPointSql {
   /// Save a geopoint in the db
   Future<GeoPoint> save(
       {@required GeoPoint geoPoint, bool withAddress, int serieId}) async {
-    if (geoPoint == null) throw ArgumentError("geoPoint must not be null");
+    if (geoPoint == null) {
+      throw ArgumentError("geoPoint must not be null");
+    }
     withAddress = withAddress ?? false;
     final gp = await _dbSaveGeoPoint(
             geoPoint: geoPoint, withAddress: withAddress, serieId: serieId)
@@ -33,8 +37,10 @@ class GeoPointSql {
 
   /// Save a geopoint image
   Future<void> saveImage(
-      {String path, String url, @required int geoPointId}) async {
-    if (geoPointId == null) throw ArgumentError("geoPointId must not be null");
+      {@required int geoPointId, String path, String url}) async {
+    if (geoPointId == null) {
+      throw ArgumentError("geoPointId must not be null");
+    }
     if (path == null && url == null) {
       throw ArgumentError("You must provide either a path or an url");
     }
@@ -52,7 +58,9 @@ class GeoPointSql {
 
   /// Get images for a geopoint
   Future<List<File>> getImages({@required int geoPointId}) async {
-    if (geoPointId == null) throw ArgumentError("geoPointId must not be null");
+    if (geoPointId == null) {
+      throw ArgumentError("geoPointId must not be null");
+    }
     final imgs = await db.select(
         table: "geopoint_image", where: "geopoint_id=$geoPointId");
     final files = <File>[];
@@ -65,7 +73,9 @@ class GeoPointSql {
 
   Future<GeoPoint> _dbSaveGeoPoint(
       {@required GeoPoint geoPoint, bool withAddress, int serieId}) async {
-    if (geoPoint == null) throw ArgumentError("geoPoint must not be null");
+    if (geoPoint == null) {
+      throw ArgumentError("geoPoint must not be null");
+    }
     withAddress = withAddress ?? false;
     int id;
     id = await _saveGeoPoint(
@@ -79,7 +89,9 @@ class GeoPointSql {
 
   Future<int> _saveGeoPoint(
       {GeoPoint geoPoint, bool verbose, int serieId}) async {
-    if (geoPoint == null) throw ArgumentError("geoPoint must not be null");
+    if (geoPoint == null) {
+      throw ArgumentError("geoPoint must not be null");
+    }
     verbose = verbose ?? false;
     if (verbose) {
       print(

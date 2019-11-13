@@ -33,8 +33,7 @@ List<DbTable> geoPointSqlSchema({
       tableName: geoPointTableName, geoSerieTableName: geoSerieTableName);
   final gs = createGeoSerieSchema(
       tableName: geoSerieTableName, geoPointTableName: geoPointImageTableName);
-  tables.add(gp);
-  tables.add(gs);
+  tables..add(gp)..add(gs);
   if (geoPointImageTableName != null) {
     tables.add(createGeoPointImageSchema(
         tableName: geoPointImageTableName,

@@ -4,7 +4,9 @@ import 'crud.dart';
 
 class _LinesCrudPageState extends State<LinesCrudPage> {
   _LinesCrudPageState({@required this.db}) {
-    if (db == null) throw (ArgumentError.notNull());
+    if (db == null) {
+      throw (ArgumentError.notNull());
+    }
   }
 
   final Db db;
@@ -15,9 +17,12 @@ class _LinesCrudPageState extends State<LinesCrudPage> {
   }
 }
 
+/// An automatic admin page for [GeoSerie] of type line
 class LinesCrudPage extends StatefulWidget {
+  /// Provide a [db]
   LinesCrudPage({@required this.db});
 
+  /// The database
   final Db db;
 
   @override
