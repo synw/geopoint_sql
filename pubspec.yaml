@@ -10,10 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  geopoint: ^0.4.0
-  sqlcool: ^3.2.0
-  sqlview: ^0.3.0
+  geopoint: ^0.7.0
+  sqlcool: ^4.1.1
+  sqlview:
+    path: ../sqlview
   pedantic: ^1.6.0
+  extra_pedantic: ^1.1.1+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
