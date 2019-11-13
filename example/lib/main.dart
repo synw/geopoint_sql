@@ -5,8 +5,8 @@ import 'conf.dart';
 import 'geocrud.dart';
 
 void main() {
-  unawaited(initDb());
   runApp(MyApp());
+  unawaited(initDb());
 }
 
 Future<void> initDb() async {
