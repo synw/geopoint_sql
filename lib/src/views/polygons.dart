@@ -4,9 +4,7 @@ import 'crud.dart';
 
 class _PolygonsCrudPageState extends State<PolygonsCrudPage> {
   _PolygonsCrudPageState({@required this.db}) {
-    if (db == null) {
-      throw ArgumentError.notNull();
-    }
+    if (db == null) throw (ArgumentError.notNull());
   }
 
   final Db db;
@@ -18,7 +16,7 @@ class _PolygonsCrudPageState extends State<PolygonsCrudPage> {
 }
 
 class PolygonsCrudPage extends StatefulWidget {
-  const PolygonsCrudPage({@required this.db});
+  PolygonsCrudPage({@required this.db});
 
   final Db db;
 

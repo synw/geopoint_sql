@@ -1,18 +1,15 @@
-import 'package:example/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:geopoint/geopoint.dart';
-import 'package:geojson/geojson.dart';
 import 'package:geopoint_sql/geopoint_sql.dart';
-import 'db.dart';
-import 'model.dart';
+import 'package:geojson/geojson.dart';
+import 'conf.dart';
 
 class _GeoCrudPageState extends State<GeoCrudPage> {
   bool ready = false;
 
   @override
   void initState() {
-    onConfReady.then((dynamic _) {
+    geoDb.onReady.then((_) {
       // load data if not present
       // data is from http://www.naturalearthdata.com
       checkRecords().then((_) {
@@ -23,25 +20,24 @@ class _GeoCrudPageState extends State<GeoCrudPage> {
   }
 
   Future<void> checkRecords() async {
-    final numRecords = await MyTimeSerieModel().sqlCount();
+    final numRecords = await geoDb.count(table: "geoserie");
     if (numRecords == 0) {
       print("Loading data...");
       final fileName = "railroads_of_north_america.geojson";
       final data = await rootBundle.loadString("assets/$fileName");
+      final geoSerieSql = GeoSerieSql(db: geoDb, verbose: true);
 
       /// Use the [geojson] package to parse the data
-      final geoSeriesToSave = <GeoSerie>[];
-      final features = await featuresFromGeoJson(data, nameProperty: "ADMIN");
+      final features = await featuresFromGeoJson(data);
       for (final feature in features.collection) {
         final GeoJsonLine line = feature.geometry as GeoJsonLine;
-        geoSeriesToSave.add(line.geoSerie);
-      }
 
-      /// Save the data
-      await MyTimeSerieModel().batchSave(geoSeries: geoSeriesToSave);
-      final ngeoPoints =
-          geoSeriesToSave.fold(0, (int v, gs) => v += gs.geoPoints.length);
-      print("Saved $ngeoPoints geopoints in ${geoSeriesToSave.length} series");
+        /// Save the data
+        geoSerieSql.save(line.geoSerie);
+      }
+      final geoSeries = await geoDb.count(table: "geoserie");
+      final geoPoints = await geoDb.count(table: "geopoint");
+      print("Saved $geoPoints geopoints in $geoSeries series");
     }
   }
 
@@ -49,7 +45,7 @@ class _GeoCrudPageState extends State<GeoCrudPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ready
-          ? GeoCrudNavigationPage(db: db, activeTab: ActiveTab.point)
+          ? GeoCrudNavigationPage(db: geoDb, activeTab: ActiveTab.line)
           : Center(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
