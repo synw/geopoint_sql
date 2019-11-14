@@ -1,82 +1,137 @@
 import 'package:flutter/foundation.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:sqlcool/sqlcool.dart';
+import 'package:sqflite/sqflite.dart';
 
 /// The class that manages the [GeoSerie] db operations
 class GeoSerieSql {
   /// Provide a [Db]
-  GeoSerieSql({@required this.db, this.verbose = false});
+  GeoSerieSql(
+      {@required this.db,
+      this.tableName = "geoserie",
+      this.geoPointTableName = "geopoint"});
 
   /// The Sqlcool database to use
   final Db db;
 
-  /// Verbosity
-  final bool verbose;
+  /// The table name
+  final String tableName;
+
+  /// The [GeoPointSql] table name
+  final String geoPointTableName;
 
   /// Save a geoserie in the db
-  void save(GeoSerie geoSerie) async {
-    if (verbose) {
-      print("Saving serie ${geoSerie.name} ${geoSerie.typeStr}");
-    }
-    final row = Map<String, String>.from(geoSerie.toMap(withId: false));
-    int id;
-    try {
-      id = await db
-          .insert(table: "geoserie", row: row, verbose: verbose)
-          .catchError((dynamic e) {
-        throw (e);
-      });
-    } catch (e) {
-      rethrow;
-    }
-    // save the geopoints in the serie
-    final rows = <Map<String, String>>[];
-    var i = 0;
-    for (final geoPoint in geoSerie.geoPoints) {
-      final gp = geoPoint.toStringsMap(withId: false);
-      gp["geoserie"] = "$id";
-      if (gp["name"] == null) {
-        gp["name"] = "Geopoint $i";
-      }
-      rows.add(gp);
-      ++i;
-    }
-    if (verbose) {
-      print("Saving ${rows.length} geopoints for serie");
-    }
-    try {
-      await db.batchInsert(table: "geopoint", rows: rows, verbose: verbose);
-    } catch (e) {
-      throw ("Can not insert geopoints $e");
-    }
-  }
+  Future<void> save(GeoSerie geoSerie) async =>
+      _save(geoSerie, conflictAlgorithm: ConflictAlgorithm.rollback);
+
+  /// Save a geoserie in the db ignoring constraint violations
+  Future<void> saveIgnore(GeoSerie geoSerie) async =>
+      _save(geoSerie, conflictAlgorithm: ConflictAlgorithm.ignore);
+
+  /// Add geopoints to this geoserie
+  Future<void> addGeoPoints(List<GeoPoint> geoPoints,
+          {@required int geoSerieId, bool verbose = false}) async =>
+      _addGeoPoints(geoPoints,
+          geoSerieId: geoSerieId,
+          conflictAlgorithm: ConflictAlgorithm.abort,
+          verbose: verbose);
+
+  /// Add geopoints to this geoserie ignoring constraint violations
+  ///
+  /// Use when you have the origin database ids of the rows or an
+  /// unique field to upsert geopoints (insert if not exists)
+  Future<void> addGeoPointsIgnore(List<GeoPoint> geoPoints,
+          {@required int geoSerieId, bool verbose = false}) async =>
+      _addGeoPoints(geoPoints,
+          geoSerieId: geoSerieId,
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+          verbose: verbose);
 
   /// Update a geoserie
-  void update(GeoSerie geoSerie) async {
+  Future<void> update(GeoSerie geoSerie, {bool verbose = false}) async {
     if (verbose) {
       print("Updating the ${geoSerie.name} ${geoSerie.typeStr} serie");
     }
     final row = Map<String, String>.from(geoSerie.toMap(withId: false));
-    await db
-        .update(
-            table: "geoserie",
-            row: row,
-            where: "id=${geoSerie.id}",
-            verbose: verbose)
-        .catchError((dynamic e) {
-      throw (e);
-    });
+    try {
+      await db.update(
+          table: tableName,
+          row: row,
+          where: "id=${geoSerie.id}",
+          verbose: verbose);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Delete a geoserie
-  void delete(GeoSerie geoSerie) async {
+  Future<void> delete(GeoSerie geoSerie, {bool verbose = false}) async {
     if (verbose) {
       print("Deleting the ${geoSerie.name} ${geoSerie.typeStr} serie");
     }
-    await db
-        .delete(table: "geoserie", where: "id=${geoSerie.id}", verbose: verbose)
-        .catchError((dynamic e) {
-      throw (e);
-    });
+    try {
+      await db.delete(
+          table: tableName, where: "id=${geoSerie.id}", verbose: verbose);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _addGeoPoints(List<GeoPoint> geoPoints,
+      {@required int geoSerieId,
+      @required ConflictAlgorithm conflictAlgorithm,
+      bool verbose = false}) async {
+    try {
+      await db.database.transaction((txn) async {
+        final batch = txn.batch();
+        var i = 1;
+        for (final geoPoint in geoPoints) {
+          final gp = geoPoint.toMap();
+          gp[tableName] = "$geoSerieId";
+          batch.insert(geoPointTableName, gp,
+              conflictAlgorithm: conflictAlgorithm);
+          ++i;
+        }
+        if (verbose) {
+          print("Saving $i geopoints from geoserie ${geoSerieId}");
+        }
+        await batch.commit();
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<int> _save(GeoSerie geoSerie,
+      {@required ConflictAlgorithm conflictAlgorithm,
+      bool verbose = false}) async {
+    if (verbose) {
+      print("Saving serie ${geoSerie.name} ${geoSerie.typeStr}");
+    }
+    final row = geoSerie.toMap();
+    int id;
+    try {
+      await db.database.transaction((txn) async {
+        id = await txn.insert(tableName, row,
+            conflictAlgorithm: ConflictAlgorithm.abort);
+        final batch = txn.batch();
+        var i = 1;
+        for (final geoPoint in geoSerie.geoPoints) {
+          final gp = geoPoint.toMap();
+          gp[tableName] = "$id";
+          batch.insert(geoPointTableName, gp,
+              conflictAlgorithm: conflictAlgorithm);
+          ++i;
+        }
+        if (verbose) {
+          print(
+              "Saving $i geopoints for serie ${geoSerie?.name ?? id} ${geoSerie.typeStr}");
+        }
+        await batch.commit();
+      });
+    } catch (e) {
+      rethrow;
+    }
+    return id;
   }
 }

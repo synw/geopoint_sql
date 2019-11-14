@@ -8,7 +8,11 @@ import 'package:geopoint/geopoint.dart';
 /// The class to manage sql operations for [GeoPoint]
 class GeoPointSql {
   /// Provide a [Db]
-  GeoPointSql({@required this.db, this.verbose = false}) {
+  GeoPointSql(
+      {@required this.db,
+      this.tableName = "geopoint",
+      this.geoSerieTableName = "geoserie",
+      this.imageTableName = "geopoint_image"}) {
     if (db == null) {
       throw ArgumentError("Database must not be null");
     }
@@ -17,8 +21,14 @@ class GeoPointSql {
   /// The Sqlcool db to use
   final Db db;
 
-  /// Verbosity
-  final bool verbose;
+  /// The table name
+  final String tableName;
+
+  /// The image table name
+  final String imageTableName;
+
+  /// The [GeoSerieSql] table name
+  final String geoSerieTableName;
 
   /// Save a geopoint in the db
   Future<GeoPoint> save(
@@ -26,18 +36,23 @@ class GeoPointSql {
     if (geoPoint == null) {
       throw ArgumentError("geoPoint must not be null");
     }
-    withAddress = withAddress ?? false;
-    final gp = await _dbSaveGeoPoint(
-            geoPoint: geoPoint, withAddress: withAddress, serieId: serieId)
-        .catchError((dynamic e) {
-      throw (e);
-    });
+    withAddress ??= false;
+    GeoPoint gp;
+    try {
+      gp = await _dbSaveGeoPoint(
+          geoPoint: geoPoint, withAddress: withAddress, serieId: serieId);
+    } catch (e) {
+      rethrow;
+    }
     return gp;
   }
 
   /// Save a geopoint image
   Future<void> saveImage(
-      {@required int geoPointId, String path, String url}) async {
+      {@required int geoPointId,
+      String path,
+      String url,
+      bool verbose = false}) async {
     if (geoPointId == null) {
       throw ArgumentError("geoPointId must not be null");
     }
@@ -49,11 +64,11 @@ class GeoPointSql {
       "url": url,
       "geopoint": "$geoPointId"
     };
-    await db
-        .insert(table: "geopoint_image", row: row, verbose: verbose)
-        .catchError((dynamic e) {
-      throw (e);
-    });
+    try {
+      await db.insert(table: imageTableName, row: row, verbose: verbose);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Get images for a geopoint
@@ -62,7 +77,7 @@ class GeoPointSql {
       throw ArgumentError("geoPointId must not be null");
     }
     final imgs = await db.select(
-        table: "geopoint_image", where: "geopoint_id=$geoPointId");
+        table: imageTableName, where: "geopoint_id=$geoPointId");
     final files = <File>[];
     imgs.forEach((img) {
       final path = img["path"].toString();
@@ -72,42 +87,40 @@ class GeoPointSql {
   }
 
   Future<GeoPoint> _dbSaveGeoPoint(
-      {@required GeoPoint geoPoint, bool withAddress, int serieId}) async {
+      {@required GeoPoint geoPoint,
+      bool withAddress,
+      int serieId,
+      bool verbose = false}) async {
     if (geoPoint == null) {
       throw ArgumentError("geoPoint must not be null");
     }
-    withAddress = withAddress ?? false;
+    withAddress ??= false;
     int id;
-    id = await _saveGeoPoint(
-            geoPoint: geoPoint, verbose: verbose, serieId: serieId)
-        .catchError((dynamic e) {
-      throw (e);
-    });
+    try {
+      id = await _saveGeoPoint(
+          geoPoint: geoPoint, verbose: verbose, serieId: serieId);
+    } catch (e) {
+      rethrow;
+    }
     geoPoint.id = id;
     return geoPoint;
   }
 
   Future<int> _saveGeoPoint(
-      {GeoPoint geoPoint, bool verbose, int serieId}) async {
+      {GeoPoint geoPoint, bool verbose = false, int serieId}) async {
     if (geoPoint == null) {
       throw ArgumentError("geoPoint must not be null");
     }
-    verbose = verbose ?? false;
     if (verbose) {
-      print(
-          "SAVING GEOPOINT ${geoPoint.latitude}/${geoPoint.longitude} INTO DB $db");
+      print("Saving geopoint $geoPoint into db");
     }
     int id;
     final row = geoPoint.toStringsMap(withId: false);
     try {
       if (serieId != null) {
-        row["geoserie"] = "$serieId";
+        row[geoSerieTableName] = "$serieId";
       }
-      id = await db
-          .insert(table: "geopoint", row: row, verbose: verbose)
-          .catchError((dynamic e) {
-        throw (e);
-      });
+      id = await db.insert(table: tableName, row: row, verbose: verbose);
     } catch (e) {
       rethrow;
     }

@@ -10,16 +10,16 @@ List<DbTable> geoPointTables = [
 ];
 
 /// The [GeoPoint] database sql schema
-final geoPointSchema = createGeoPointSchema();
+final DbTable geoPointSchema = createGeoPointSchema();
 
 /// Tha [GeoSerie] schema
-final geoSerieSchema = createGeoSerieSchema();
+final DbTable geoSerieSchema = createGeoSerieSchema();
 
 /// The [GeoPointProperty] schema
-final geoPointPropertySchema = createGeoPointPropertySchema();
+final DbTable geoPointPropertySchema = createGeoPointPropertySchema();
 
 /// The geopoint image schema
-final geoPointImageSchema = createGeoPointImageSchema();
+final DbTable geoPointImageSchema = createGeoPointImageSchema();
 
 /// A function to create a schema from table names
 List<DbTable> geoPointSqlSchema({
@@ -94,13 +94,13 @@ DbTable createGeoSerieSchema(
     ..varchar("type",
         check: 'type = "group" or type = "line" or type="polygon"')
     ..real("surface", nullable: true)
-    ..index("name")
     ..foreignKey("centroid",
         reference: geoPointTableName,
         onDelete: OnDelete.cascade,
         nullable: true)
     ..foreignKey("boundary",
-        reference: tableName, onDelete: OnDelete.cascade, nullable: true);
+        reference: tableName, onDelete: OnDelete.cascade, nullable: true)
+    ..index("name");
 }
 
 /// The geopoint image database schema generator
