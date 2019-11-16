@@ -5,7 +5,7 @@ import 'package:sqlview/sqlview.dart';
 class _CrudPageState extends State<CrudPage> {
   _CrudPageState({@required this.db, @required this.type}) {
     if (db == null) {
-      throw (ArgumentError.notNull());
+      throw ArgumentError.notNull();
     }
     _dbIsReady = db.isReady;
   }
@@ -53,8 +53,8 @@ class _CrudPageState extends State<CrudPage> {
   @override
   Widget build(BuildContext context) {
     return !_dbIsReady
-        ? Center(
-            child: const CircularProgressIndicator(),
+        ? const Center(
+            child: CircularProgressIndicator(),
           )
         : Stack(children: <Widget>[
             CrudView(bloc: bloc),
@@ -65,7 +65,7 @@ class _CrudPageState extends State<CrudPage> {
 /// An admin page
 class CrudPage extends StatefulWidget {
   /// Default constructor
-  CrudPage({@required this.db, @required this.type});
+  const CrudPage({@required this.db, @required this.type});
 
   /// The database
   final Db db;

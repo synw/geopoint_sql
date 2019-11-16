@@ -6,7 +6,7 @@ import 'crud.dart';
 class _GeoPointCrudPageState extends State<GeoPointCrudPage> {
   _GeoPointCrudPageState({@required this.db, this.markersTrailingBuilder}) {
     if (db == null) {
-      throw (ArgumentError.notNull());
+      throw ArgumentError.notNull();
     }
   }
 
@@ -22,7 +22,7 @@ class _GeoPointCrudPageState extends State<GeoPointCrudPage> {
 /// An automatic admin page for [GeoPoint]
 class GeoPointCrudPage extends StatefulWidget {
   /// Provide a [db]
-  GeoPointCrudPage({@required this.db, this.markersTrailingBuilder});
+  const GeoPointCrudPage({@required this.db, this.markersTrailingBuilder});
 
   /// The trailing builder in list
   final ItemWidgetBuilder markersTrailingBuilder;

@@ -28,7 +28,7 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
       this.activeTab,
       this.markersTrailingBuilder}) {
     if (db == null) {
-      throw (ArgumentError.notNull());
+      throw ArgumentError.notNull();
     }
     _getActiveTab();
   }
@@ -122,7 +122,7 @@ class _GeoCrudNavigationPageState extends State<GeoCrudNavigationPage> {
 /// Navigation page
 class GeoCrudNavigationPage extends StatefulWidget {
   /// Default constructor
-  GeoCrudNavigationPage(
+  const GeoCrudNavigationPage(
       {@required this.db,
       this.appBar,
       this.activeTab,

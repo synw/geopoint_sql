@@ -5,7 +5,7 @@ import 'crud.dart';
 class _PolygonsCrudPageState extends State<PolygonsCrudPage> {
   _PolygonsCrudPageState({@required this.db}) {
     if (db == null) {
-      throw (ArgumentError.notNull());
+      throw ArgumentError.notNull();
     }
   }
 
@@ -20,7 +20,7 @@ class _PolygonsCrudPageState extends State<PolygonsCrudPage> {
 /// An automatic admin page for [GeoSerie] of type polygon
 class PolygonsCrudPage extends StatefulWidget {
   /// Provide a [db]
-  PolygonsCrudPage({@required this.db});
+  const PolygonsCrudPage({@required this.db});
 
   /// The database
   final Db db;

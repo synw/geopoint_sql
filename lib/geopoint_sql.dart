@@ -1,6 +1,7 @@
 library geopointsql;
 
 export 'src/database_schema.dart';
+export 'src/geodb.dart';
 export 'src/geopoint.dart';
 export 'src/geoserie.dart';
 export 'src/views/crud_navigation.dart';

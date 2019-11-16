@@ -1,18 +1,18 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:flutter/material.dart';
+
 import 'package:flutter/foundation.dart';
-import 'package:sqlcool/sqlcool.dart';
+import 'package:flutter/material.dart';
 import 'package:geopoint/geopoint.dart';
+import 'package:sqlcool/sqlcool.dart';
 
 /// The class to manage sql operations for [GeoPoint]
 class GeoPointSql {
   /// Provide a [Db]
   GeoPointSql(
       {@required this.db,
-      this.tableName = "geopoint",
+      this.geoPointTableName = "geopoint",
       this.geoSerieTableName = "geoserie",
-      this.imageTableName = "geopoint_image"}) {
+      this.geoPointImageTableName = "geopoint_image"}) {
     if (db == null) {
       throw ArgumentError("Database must not be null");
     }
@@ -22,17 +22,22 @@ class GeoPointSql {
   final Db db;
 
   /// The table name
-  final String tableName;
+  final String geoPointTableName;
 
   /// The image table name
-  final String imageTableName;
+  final String geoPointImageTableName;
 
   /// The [GeoSerieSql] table name
   final String geoSerieTableName;
 
   /// Save a geopoint in the db
+  ///
+  /// Returns the [GeoPoint] with a database id set
   Future<GeoPoint> save(
-      {@required GeoPoint geoPoint, bool withAddress, int serieId}) async {
+      {@required GeoPoint geoPoint,
+      bool withAddress,
+      int serieId,
+      bool verbose = false}) async {
     if (geoPoint == null) {
       throw ArgumentError("geoPoint must not be null");
     }
@@ -40,7 +45,10 @@ class GeoPointSql {
     GeoPoint gp;
     try {
       gp = await _dbSaveGeoPoint(
-          geoPoint: geoPoint, withAddress: withAddress, serieId: serieId);
+          geoPoint: geoPoint,
+          withAddress: withAddress,
+          serieId: serieId,
+          verbose: verbose);
     } catch (e) {
       rethrow;
     }
@@ -48,7 +56,9 @@ class GeoPointSql {
   }
 
   /// Save a geopoint image
-  Future<void> saveImage(
+  ///
+  /// Returns the database id of the saved image
+  Future<int> saveImage(
       {@required int geoPointId,
       String path,
       String url,
@@ -64,27 +74,30 @@ class GeoPointSql {
       "url": url,
       "geopoint": "$geoPointId"
     };
+    int id;
     try {
-      await db.insert(table: imageTableName, row: row, verbose: verbose);
+      id = await db.insert(
+          table: geoPointImageTableName, row: row, verbose: verbose);
     } catch (e) {
       rethrow;
     }
+    return id;
   }
 
   /// Get images for a geopoint
-  Future<List<File>> getImages({@required int geoPointId}) async {
+  /*Future<List<File>> getImages({@required int geoPointId}) async {
     if (geoPointId == null) {
       throw ArgumentError("geoPointId must not be null");
     }
     final imgs = await db.select(
-        table: imageTableName, where: "geopoint_id=$geoPointId");
+        table: geoPointImageTableName, where: "geopoint_id=$geoPointId");
     final files = <File>[];
     imgs.forEach((img) {
       final path = img["path"].toString();
       files.add(File(path));
     });
     return files;
-  }
+  }*/
 
   Future<GeoPoint> _dbSaveGeoPoint(
       {@required GeoPoint geoPoint,
@@ -120,7 +133,8 @@ class GeoPointSql {
       if (serieId != null) {
         row[geoSerieTableName] = "$serieId";
       }
-      id = await db.insert(table: tableName, row: row, verbose: verbose);
+      id =
+          await db.insert(table: geoPointTableName, row: row, verbose: verbose);
     } catch (e) {
       rethrow;
     }
