@@ -21,6 +21,14 @@ final DbTable geoPointPropertySchema = createGeoPointPropertySchema();
 /// The geopoint image schema
 final DbTable geoPointImageSchema = createGeoPointImageSchema();
 
+/// Create a geopoint schema from a name
+List<DbTable> geoPointSqlSchemaFromName(String name) => geoPointSqlSchema(
+      geoPointPropertyTableName: "${name}_property",
+      geoPointTableName: "${name}_geopoint",
+      geoSerieTableName: "${name}_geoserie",
+      geoPointImageTableName: "${name}_image",
+    );
+
 /// A function to create a schema from table names
 List<DbTable> geoPointSqlSchema({
   @required String geoPointTableName,
