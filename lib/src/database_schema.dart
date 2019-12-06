@@ -59,7 +59,7 @@ List<DbTable> geoPointSqlSchema({
 DbTable createGeoPointSchema(
     {String tableName = "geopoint", String geoSerieTableName = "geoserie"}) {
   return DbTable(tableName)
-    ..varchar("name")
+    ..varchar("name", nullable: true)
     ..varchar("slug", unique: true, nullable: true)
     ..timestamp()
     ..real("latitude")
@@ -97,7 +97,7 @@ DbTable createGeoPointPropertySchema(
 DbTable createGeoSerieSchema(
     {String tableName = "geoserie", String geoPointTableName = "geopoint"}) {
   return DbTable(tableName)
-    ..varchar("name")
+    ..varchar("name", nullable: true)
     ..varchar("slug", unique: true, nullable: true)
     ..varchar("type",
         check: 'type = "group" or type = "line" or type="polygon"')
