@@ -67,7 +67,7 @@ class GeoSerieSql {
   }
 
   /// Delete a geoserie
-  /* Future<void> delete(GeoSerie geoSerie, {bool verbose = false}) async {
+  Future<void> delete(GeoSerie geoSerie, {bool verbose = false}) async {
     if (verbose) {
       print("Deleting the ${geoSerie.name} ${geoSerie.typeStr} serie");
     }
@@ -79,7 +79,7 @@ class GeoSerieSql {
     } catch (e) {
       rethrow;
     }
-  }*/
+  }
 
   Future<void> _addGeoPoints(List<GeoPoint> geoPoints,
       {@required int geoSerieId,
@@ -97,7 +97,7 @@ class GeoSerieSql {
           ++i;
         }
         if (verbose) {
-          print("Saving $i geopoints from geoserie ${geoSerieId}");
+          print("Saving $i geopoints from geoserie $geoSerieId");
         }
         await batch.commit();
       });
@@ -121,6 +121,7 @@ class GeoSerieSql {
         final batch = txn.batch();
         var i = 1;
         for (final geoPoint in geoSerie.geoPoints) {
+          geoPoint.timestamp ??= DateTime.now().millisecondsSinceEpoch;
           final gp = geoPoint.toMap();
           gp[geoSerieTableName] = "$id";
           batch.insert(geoPointTableName, gp,
